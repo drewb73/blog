@@ -1,6 +1,7 @@
 const expressAsyncHandler = require('express-async-handler');
 const generateToken = require('../../config/token/generateToken');
 const User = require("../../model/user/User")
+const validateMongodbId = require('../../utils/validateMongodbID')
 
 
 
@@ -37,6 +38,7 @@ const userRegisterCtrl = expressAsyncHandler(async (req, res) => {
 
       if(userFound &&  (await userFound.isPasswordMatched(password))){
           res.json({
+              _id: userFound?._id,
               firstName: userFound?.firstName,
               lastName: userFound?.lastName,
               email: userFound?.email,
@@ -52,5 +54,78 @@ const userRegisterCtrl = expressAsyncHandler(async (req, res) => {
 
   })
 
+  //fetch all Users
+  const fetchUsersCtrl = expressAsyncHandler(async(req,res) => {
+      console.log(req.headers)
+      try {
+          const users = await User.find({})
+          res.json(users)
+      } catch (error) {
+          res.json(error)
+      }
 
-module.exports = { userRegisterCtrl, loginUserCtrl };
+  })
+
+  //Delete users
+  const deleteUsersCtrl = expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    //check if user id is valid
+    validateMongodbId(id);
+    try {
+      const deletedUser = await User.findByIdAndDelete(id);
+      res.json(deletedUser);
+    } catch (error) {
+      res.json(error);
+    }
+  });
+
+  //fetch single user details
+
+  const fetchUserDetailsCtrl = expressAsyncHandler(async(req,res) =>{
+      const { id } = req.params
+      //check if valid id
+      validateMongodbId(id)
+      try {
+          const user = await User.findById(id)
+          res.json(user)
+      } catch (error) {
+          res.json(error)
+      }
+  })
+
+  //user profile
+  const userProfileCtrl = expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    validateMongodbId(id);
+    try {
+      const myProfile = await User.findById(id);
+      res.json(myProfile);
+    } catch (error) {
+      res.json(error);
+    }
+  });
+
+  //updateprofile
+  const updateUserCtrl = expressAsyncHandler(async (req, res) => {
+    const { _id } = req?.user;
+    validateMongodbId(_id);
+  
+    const user = await User.findByIdAndUpdate(
+      _id,
+      {
+        firstName: req?.body?.firstName,
+        lastName: req?.body?.lastName,
+        email: req?.body?.email,
+        bio: req?.body?.bio,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    res.json(user);
+  });
+
+
+
+module.exports = { userRegisterCtrl, loginUserCtrl, fetchUsersCtrl, deleteUsersCtrl, fetchUserDetailsCtrl, userProfileCtrl, updateUserCtrl};
