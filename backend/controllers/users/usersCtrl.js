@@ -1,5 +1,7 @@
-const expressAsyncHandler = require('express-async-handler')
+const expressAsyncHandler = require('express-async-handler');
+const generateToken = require('../../config/token/generateToken');
 const User = require("../../model/user/User")
+
 
 
 //-------------------------------------
@@ -25,4 +27,30 @@ const userRegisterCtrl = expressAsyncHandler(async (req, res) => {
     }
   })
 
-module.exports = { userRegisterCtrl };
+  //Login user
+  const loginUserCtrl = expressAsyncHandler(async (req,res) => {
+      const {email, password} = req.body
+      //check if user exists
+      const userFound = await User.findOne({email})
+
+      //check if password matches
+
+      if(userFound &&  (await userFound.isPasswordMatched(password))){
+          res.json({
+              firstName: userFound?.firstName,
+              lastName: userFound?.lastName,
+              email: userFound?.email,
+              profilePhoto: userFound?.profilePhoto,
+              isAdmin: userFound?.isAdmin,
+              token: generateToken(userFound?._id),
+          })
+      }
+      else {
+          res.status(401)
+          throw new Error('Invalid Login Credentials')
+      }
+
+  })
+
+
+module.exports = { userRegisterCtrl, loginUserCtrl };

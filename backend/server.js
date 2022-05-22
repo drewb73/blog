@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const dbConnect = require("./config/db/dbConnect");
 const userRoutes = require("./route/users/usersRoute");
-const {erroHandler} = require('./middleware/error/errorHandler')
+const {erroHandler, notFound} = require('./middleware/error/errorHandler')
 
 const app = express();
 //DB
@@ -16,6 +16,7 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 
 //erro handler belwo routes
+app.use(notFound)
 app.use(erroHandler)
 
 //server
