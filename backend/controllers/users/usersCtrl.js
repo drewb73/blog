@@ -274,6 +274,63 @@ const accountVerificationCtrl = expressAsyncHandler(async(req,res) => {
 })
 
 
+//1. generate token and send to user
+//2. take token and find user
+const forgetPasswordToken = expressAsyncHandler(async(req,res) => {
+  //find the user by email address
+  const { email } = req.body
+
+
+  const user = await User.findOne({ email })
+  if(!user) throw new Error('user not found')
+ 
+
+  try {
+    const token = await user.createPasswordResetToken()
+    console.log(token)
+    await user.save()
+
+       //build your message
+
+       const resetURL = `If you want to reset your password, reset now within 10 minutes, otherwise ignore this message <a href='http://localhost:3000/reset-password/${token}'>Click Here to Verify</a>`
+       const msg = {
+         to: email,
+         from: 'bartondrew5@gmail.com',
+         subject: 'Reset Password',
+         html: resetURL,
+       }
+
+       const emailMsg = await sgMail.send(msg)
+
+    res.json({
+      msg: `A verification message is successfully sent to ${user?.email}. Reset now within 10 minutes, ${resetURL}`
+    })
+  } catch (error) {
+    res.json(error)
+  }
+})
+
+
+//update password (reset password)
+
+const passwordResetCtrl = expressAsyncHandler(async(req, res) => {
+  const {token, password} = req.body
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
+
+  // find user by token
+  const user = await User.findOne({passwordResetToken: hashedToken, passwordResetExpires: {$gt : Date.now()}})
+  if(!user) throw new Error('Token expired')
+
+
+  //update or change password
+  user.password = password
+  user.passwordResetToken = undefined
+  user.passwordResetExpires = undefined
+  await user.save()
+
+  res.json(user)
+
+})
 
 
 module.exports = {
@@ -291,4 +348,6 @@ module.exports = {
   unBlockUserCtrl,
   generateVerificationTokenCtrl,
   accountVerificationCtrl,
+  forgetPasswordToken,
+  passwordResetCtrl
 };

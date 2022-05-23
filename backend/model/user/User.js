@@ -83,7 +83,7 @@ const userSchema = new mongoose.Schema(
       ],
     },
     passwordChangeAt: Date,
-    passwordRessetToken: String,
+    passwordResetToken: String,
     passwordResetExpires: Date,
 
     active: {
@@ -121,13 +121,21 @@ userSchema.methods.isPasswordMatched = async function (enteredPassword) {
 //verfiy account for sendgrid mailer
 userSchema.methods.createAccountVerificationToken = async function () {
     //create a token using crypto
-    const verificationToken = crypto.randomBytes(32).toString('hex')
-    this.accountVerificationToken = crypto.createHash('sha256').update(verificationToken).digest('hex')
-
-    this.accountVerificationTokenExpires = Date.now() + 30 * 60 * 1000 //10 minutes
-
-    return verificationToken
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    this.accountVerificationToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
+    this.accountVerificationTokenExpires = Date.now() + 30 * 60 * 1000; //10 minutes
+    return verificationToken;
 }
+
+//forget password
+userSchema.methods.createPasswordResetToken = async function () {
+    //create a token using crypto
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    this.passwordResetExpires = Date.now() + 30 * 60 * 1000; //10 minutes
+    return resetToken;
+}
+
 
 
 
