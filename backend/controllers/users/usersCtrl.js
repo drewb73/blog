@@ -1,7 +1,11 @@
 const expressAsyncHandler = require("express-async-handler");
+const sgMail = require('@sendgrid/mail');
+const crypto = require('crypto');
 const generateToken = require("../../config/token/generateToken");
 const User = require("../../model/user/User");
 const validateMongodbId = require("../../utils/validateMongodbID");
+
+sgMail.setApiKey(process.env.SEND_GRID_API_KEY)
 
 //-------------------------------------
 //Register
@@ -220,6 +224,57 @@ const unBlockUserCtrl = expressAsyncHandler(async(req, res) => {
   res.json(user)
 })
 
+//sendgrid send email and account verification
+const generateVerificationTokenCtrl = expressAsyncHandler(async(req,res) => {
+  const loginUserId = req.user.id
+  
+  const user = await User.findById(loginUserId)
+  
+  try {
+    //generate token
+    const verificationToken = await user.createAccountVerificationToken()
+    //save to the user
+    await user.save()
+    console.log(verificationToken)
+    //build your message
+
+    const resetURL = `If you were requesting to verify your account, verify now within 10 minutes, otherwise ignore this message <a href='http://localhost:3000/verify-account/${verificationToken}'>Click Here to Verify</a>`
+    const msg = {
+      to: 'bartondrew5@gmail.com',
+      from: 'bartondrew5@gmail.com',
+      subject: 'My first Email from Node Js',
+      html: resetURL,
+    }
+
+    await sgMail.send(msg)
+    res.json(resetURL)
+  } catch(error) {
+    res.json(error)
+  }
+})
+
+//change to verified account 
+const accountVerificationCtrl = expressAsyncHandler(async(req,res) => {
+  const { token } = req.body
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
+  
+  //find this user by token
+  const userFound = await User.findOne({
+    accountVerificationToken: hashedToken,
+    accountVerificationTokenExpires: {$gt: new Date() },
+  })
+
+  if(!userFound) throw new Error('token expired, try again')
+  //update the property to true
+  userFound.isAccountVerified = true
+  userFound.accountVerificationToken = undefined
+  userFound.accountVerificationTokenExpires = undefined
+  await userFound.save()
+  res.json(userFound)
+})
+
+
+
 
 module.exports = {
   userRegisterCtrl,
@@ -233,5 +288,7 @@ module.exports = {
   followingUserCtrl,
   unfollowUserCtrl,
   blockUserCtrl,
-  unBlockUserCtrl
+  unBlockUserCtrl,
+  generateVerificationTokenCtrl,
+  accountVerificationCtrl,
 };
