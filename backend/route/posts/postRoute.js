@@ -1,5 +1,5 @@
 const express = require('express')
-const { createPostCtrl, fetchPostsCtrl, fetchPostCtrl, updatePostCtrl, deletePostCtrl, addLikeCtrl } = require('../../controllers/posts/postCtrl')
+const { createPostCtrl, fetchPostsCtrl, fetchPostCtrl, updatePostCtrl, deletePostCtrl, addLikeCtrl, addDislikeCtrl } = require('../../controllers/posts/postCtrl')
 const authMiddleware = require('../../middleware/auth/authMiddleware')
 const { photoUpload, postPhotoResize } = require('../../middleware/upload/photoUpload')
 
@@ -19,6 +19,7 @@ postRoute.post(
   );
 
   postRoute.put("/like", authMiddleware, addLikeCtrl);
+  postRoute.put("/dislike", authMiddleware, addDislikeCtrl);
   
   postRoute.get("/", fetchPostsCtrl);
   postRoute.get("/:id", fetchPostCtrl);
