@@ -1,12 +1,13 @@
 const expressAsyncHandler = require("express-async-handler");
 const Filter = require("bad-words");
+const fs = require("fs");
 const Post = require("../../model/post/Post");
 const User = require("../../model/user/User");
 const validateMongodbId = require("../../utils/validateMongodbID");
 const cloudinaryUploadImg = require("../../utils/cloudinary");
 
 
-
+//--------------> create post
 const createPostCtrl = expressAsyncHandler(async(req,res) => {
     console.log(req.file)
     const {_id} = req.user
@@ -28,13 +29,37 @@ const createPostCtrl = expressAsyncHandler(async(req,res) => {
   const imgUploaded = await cloudinaryUploadImg(localPath)
   
     try {
-        const post = await Post.create({...req.body, image: imgUploaded?.url,
-            user: _id,
-         })
-        res.json(post)
+        // const post = await Post.create({...req.body, image: imgUploaded?.url,
+        //     user: _id,
+        //  })
+        res.json(imgUploaded)
+        //remove saved file from local storage
+        fs.unlinkSync(localPath)
     } catch (error) {
         res.json(error)
     }
 })
 
-module.exports = {createPostCtrl}
+//----------> fetch all posts
+const fetchPostsCtrl = expressAsyncHandler(async(req,res) => {
+    try {
+    const posts = await Post.find({}).populate('user')
+
+    res.json(posts)
+    } catch (error) {
+    }
+})
+
+//-------> fetch single post
+const fetchPostCtrl = expressAsyncHandler(async(req,res) => {
+    const {id} = req.params
+    validateMongodbId(id)
+    try {
+        const post = await Post.findById(id).populate('user')
+        res.json(post)
+    } catch(error) {
+        res.json(error)
+    }
+})
+
+module.exports = {createPostCtrl, fetchPostsCtrl, fetchPostCtrl}

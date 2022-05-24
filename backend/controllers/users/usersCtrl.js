@@ -1,5 +1,6 @@
 const expressAsyncHandler = require("express-async-handler");
 const sgMail = require('@sendgrid/mail');
+const fs = require("fs");
 const crypto = require('crypto');
 const generateToken = require("../../config/token/generateToken");
 const User = require("../../model/user/User");
@@ -107,7 +108,7 @@ const userProfileCtrl = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongodbId(id);
   try {
-    const myProfile = await User.findById(id);
+    const myProfile = await User.findById(id).populate('posts');
     res.json(myProfile);
   } catch (error) {
     res.json(error);
@@ -346,6 +347,9 @@ const profilePhotoUploadCtrl = expressAsyncHandler(async(req, res) => {
   const foundUser = await User.findByIdAndUpdate(_id, {
     profilePhoto: imgUploaded?.url,
   }, {new: true})
+
+  //remove photo from local storage
+  fs.unlinkSync(localPath)
  
   res.json(foundUser)
 })
