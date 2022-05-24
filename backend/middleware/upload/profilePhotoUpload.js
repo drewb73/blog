@@ -32,9 +32,9 @@ const profilePhotoResize = async (req, res, next) => {
   //check if file exists
   if(!req.file) return next()
 
-  req.file.fileName = `user-${Date.now()}-${req.file.originalname}`
+  req.file.filename = `user-${Date.now()}-${req.file.originalname}`
 
-  await sharp(req.file.buffer).resize(250, 250).toFormat('jpeg').jpeg({quality: 90}).toFile(path.join(`public/images/profile/${req.file.fileName}`))
+  await sharp(req.file.buffer).resize(250, 250).toFormat('jpeg').jpeg({quality: 90}).toFile(path.join(`public/images/profile/${req.file.filename}`))
   next()
 
 }

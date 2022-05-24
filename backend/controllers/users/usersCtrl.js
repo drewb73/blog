@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const generateToken = require("../../config/token/generateToken");
 const User = require("../../model/user/User");
 const validateMongodbId = require("../../utils/validateMongodbID");
+const cloudinaryUploadImg = require("../../utils/cloudinary");
 
 sgMail.setApiKey(process.env.SEND_GRID_API_KEY)
 
@@ -334,8 +335,19 @@ const passwordResetCtrl = expressAsyncHandler(async(req, res) => {
 
 //profile photo upload
 const profilePhotoUploadCtrl = expressAsyncHandler(async(req, res) => {
-  console.log(req.file)
-  res.json('upload')
+  //find the login user to update profile pic
+  const {_id} = req.user
+ 
+  //1. Get path of file to upload
+  const localPath = `public/images/profile/${req.file.filename}`
+  //2. uplaod to cloudinary
+  const imgUploaded = await cloudinaryUploadImg(localPath)
+
+  const foundUser = await User.findByIdAndUpdate(_id, {
+    profilePhoto: imgUploaded?.url,
+  }, {new: true})
+ 
+  res.json(foundUser)
 })
 
 

@@ -23,5 +23,5 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, console.log(`Server is running ${PORT}`));
 
-//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
+
 
