@@ -81,4 +81,29 @@ const updatePostCtrl = expressAsyncHandler(async(req, res) => {
     }
 })
 
-module.exports = {createPostCtrl, fetchPostsCtrl, fetchPostCtrl, updatePostCtrl}
+//-----------> delete Posts
+const deletePostCtrl = expressAsyncHandler(async(req,res) => {
+    const {id} = req.params
+    validateMongodbId(id)
+    try {
+        const post = await Post.findByIdAndDelete(id)
+        res.json(post)
+    } catch (error) {
+        res.json(error)
+        
+    }
+})
+
+//--------> Post Likes
+const addLikeCtrl = expressAsyncHandler(async (req, res) => {
+    
+    res.json('like');
+  });
+
+
+//--------> Post DisLikes
+// const = expressAsyncHandler(async(req,res) => {
+    
+// })
+
+module.exports = {createPostCtrl, fetchPostsCtrl, fetchPostCtrl, updatePostCtrl, deletePostCtrl, addLikeCtrl}
