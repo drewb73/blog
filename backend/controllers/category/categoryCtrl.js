@@ -26,4 +26,50 @@ const fetchCategoriesCtrl = expressAsyncHandler(async (req, res) => {
     }
   });
 
-module.exports = { createCategoryCtrl, fetchCategoriesCtrl };
+  //fetch one
+const fetchCategoryCtrl = expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    try {
+      const category = await Category.findById(id)
+        .populate("user")
+        .sort("-createdAt");
+      res.json(category);
+    } catch (error) {
+      res.json(error);
+    }
+  });
+
+  //update
+const updateCategoryCtrl = expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    try {
+      const category = await Category.findByIdAndUpdate(
+        id,
+        {
+          title: req?.body?.title,
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+      res.json(category);
+    } catch (error) {
+      res.json(error);
+    }
+  });
+
+
+  //delete category
+const deleteCateoryCtrl = expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    try {
+      const category = await Category.findByIdAndDelete(id);
+  
+      res.json(category);
+    } catch (error) {
+      res.json(error);
+    }
+  });
+
+module.exports = { createCategoryCtrl, fetchCategoriesCtrl, fetchCategoryCtrl, updateCategoryCtrl, deleteCateoryCtrl};
