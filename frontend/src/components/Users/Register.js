@@ -1,4 +1,5 @@
 import React from "react";
+import {Navigate} from 'react-router-dom'
 import { useFormik } from "formik";
 import {useDispatch, useSelector} from 'react-redux'
 import * as Yup from "yup";
@@ -39,7 +40,10 @@ const dispatch = useDispatch()
   const storeData = useSelector(store => store?.users)
   const {loading, appErr, serverErr, registered} = storeData
 
-  console.log(appErr, serverErr)
+  //redirect to another page
+  if(registered) {
+    return <Navigate to='/profile' />
+  }
 
   console.log(storeData)
 
