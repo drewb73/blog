@@ -63,7 +63,7 @@ const dispatch = useDispatch()
                 <form onSubmit={formik.handleSubmit}>
                   <h3 className="mb-10 text-2xl text-white font-bold font-heading">
                     Register Account
-                       {/* display error message */}
+                       {/* display error message update with toastify */}
                   {appErr || serverErr ? <div className="text-red-300">
                     {serverErr} {appErr}
                   </div> : null}
