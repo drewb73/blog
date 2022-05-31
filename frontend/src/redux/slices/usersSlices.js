@@ -1,5 +1,6 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
 import axios from 'axios'
+import { baseUrl } from '../../utils/baseURL'
 
 //register action
 export const registerUserAction = createAsyncThunk('users/register', async (user, {rejectWithValue, getState, dispatch}) => {
@@ -10,7 +11,7 @@ export const registerUserAction = createAsyncThunk('users/register', async (user
                 'Content-Type': 'application/json',
             },
         }
-        const {data} = await axios.post('http://localhost:5000/api/users/register', user, config )
+        const {data} = await axios.post(`${baseUrl}/api/users/register`, user, config )
         return data
         
     } catch (error) {
@@ -20,6 +21,31 @@ export const registerUserAction = createAsyncThunk('users/register', async (user
         return rejectWithValue(error?.response?.data)
     }
 })
+
+//login action
+export const loginUserAction = createAsyncThunk(
+    'user/login',
+    async (userData, {rejectWithValue, getState, dispatch}) => {
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }
+        try {
+            //make http call here
+            const {data} = await axios.post(`${baseUrl}/api/users/login`, userData, config)
+            //save user into local storage
+            localStorage.setItem('userInfo', JSON.stringify(userData))
+            return data
+        } catch (error) {
+            if(!error?.response) {
+                throw error
+            } 
+            return rejectWithValue(error?.response?.data)
+        }
+    }
+)
+
 
 //slices
 
