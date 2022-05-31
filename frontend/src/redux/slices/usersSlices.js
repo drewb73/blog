@@ -73,6 +73,26 @@ const usersSlices = createSlice({
             state.appErr = action?.payload?.message
             state.serverErr = action?.error?.message
         })
+
+
+        //login
+        builder.addCase(loginUserAction.pending, (state, action) => {
+            state.loading = true
+            state.appErr = undefined
+            state.serverErr = undefined
+
+        })
+        builder.addCase(loginUserAction.fulfilled, (state,action) => {
+            state.userAuth = action?.payload
+            state.loading = false
+            state.appErr = undefined
+            state.serverErr = undefined
+        })
+        builder.addCase(loginUserAction.rejected, (state, action) => {
+            state.appErr = action?.payload?.message
+            state.serverErr = action?.error?.message
+            state.loading = false
+        })
     },
 })
 
