@@ -35,7 +35,7 @@ export const loginUserAction = createAsyncThunk(
             //make http call here
             const {data} = await axios.post(`${baseUrl}/api/users/login`, userData, config)
             //save user into local storage
-            localStorage.setItem('userInfo', JSON.stringify(userData))
+            localStorage.setItem('userInfo', JSON.stringify(data))
             return data
         } catch (error) {
             if(!error?.response) {
@@ -47,12 +47,17 @@ export const loginUserAction = createAsyncThunk(
 )
 
 
+// get user from local storage and place into store
+const userLoginFromStorage = localStorage.getItem("userInfo")
+  ? JSON.parse(localStorage.getItem("userInfo"))
+  : null;
+
 //slices
 
 const usersSlices = createSlice({
     name: 'users',
     initialState: {
-        userAuth: 'login',
+        userAuth: userLoginFromStorage
     },
     extraReducers: (builder) => {
         builder.addCase(registerUserAction.pending, (state, action) => {
