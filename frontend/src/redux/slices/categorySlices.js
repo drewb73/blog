@@ -5,11 +5,20 @@ import { baseUrl } from '../../utils/baseURL'
 //action
 
 export const createCategoryAction = createAsyncThunk('category/create', async (category, {rejectWithValue, getState, dispatch}) => {
+    //get user token
+    const users = getState()?.users
+    const { userAuth } = users
+    const config = {
+        headers: {
+            Authorization: `Bearer ${userAuth?.token}`
+        }
+    }
     //http callback
     try {
         const {data} = await axios.post(`${baseUrl}/api/category`, {
             title: category?.title,
-        })
+        }, config)
+        return data
     } catch (error) {
         if(!error?.response) {
             throw error
@@ -21,7 +30,7 @@ export const createCategoryAction = createAsyncThunk('category/create', async (c
 //slices 
 const categorySlices = createSlice({
     name: 'category',
-    initialState: {category: 'NODE JS'},
+    initialState: {},
     extraReducers: (builder) => {
         builder.addCase(createCategoryAction.pending, (state, action) => {
             state.loading = true
