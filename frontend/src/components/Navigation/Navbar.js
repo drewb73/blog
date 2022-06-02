@@ -14,7 +14,7 @@ const Navbar = () => {
    
   return (
     <>
-      {!userAuth ? <Public/> : userAuth ? <Private /> : isAdmin && <Admin /> }
+      {isAdmin ? <Admin /> : userAuth ? <Private /> : <Public />}
     </>
   );
 };

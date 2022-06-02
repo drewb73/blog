@@ -32,9 +32,9 @@ const Login = () => {
   const store = useSelector((state) => state?.users)
   console.log(store)
   const {userAuth, loading, serverErr, appErr} = store
-  // if(userAuth) {
-  //   return <Navigate to='/profile' />
-  // }
+  if(userAuth) {
+    return <Navigate to='/profile' />
+  }
 
   return (
     <>
