@@ -61,6 +61,7 @@ const CategoryList = () => {
                     </tr>
                   </thead>
                   <tbody>
+                      {/* Display rows dynamicaly */}
                     {categoryList?.map(category => (
                       <tr className="bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
