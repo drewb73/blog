@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-
 import { PencilAltIcon } from "@heroicons/react/outline";
 import { fetchCategoriesAction } from "../../redux/slices/categorySlices";
+import Moment from 'react-moment'
 
 const CategoryList = () => {
   const dispatch = useDispatch();
@@ -88,7 +88,9 @@ const CategoryList = () => {
                           {category.title}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <Moment format='DD/MM/YYYY' >
                           {category?.createdAt}
+                          </Moment>
                         </td>
                         <Link to='/'>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
