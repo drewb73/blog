@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createCategoryAction } from "../../redux/slices/categorySlices";
 import { Formik, useFormik } from "formik";
 import * as Yup from "yup";
+import { Navigate } from "react-router-dom";
 
 //Form schema
 const formSchema = Yup.object({
@@ -30,11 +31,11 @@ const AddNewCategory = () => {
   const state = useSelector(state => state?.category)
 
 
-  const {loading, appErr, serverErr, cetegory} = state
+  const {loading, appErr, serverErr, category, isCreated} = state
+
+  //redirect
+  if(isCreated) return <Navigate to='/category-list' />
   
-
-
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
