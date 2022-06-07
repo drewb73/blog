@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { PencilAltIcon } from "@heroicons/react/outline";
 import { fetchCategoriesAction } from "../../redux/slices/categorySlices";
 import Moment from 'react-moment'
+import Spinner from "../../utils/Spinner";
 
 const CategoryList = () => {
   const dispatch = useDispatch();
@@ -17,7 +18,9 @@ const CategoryList = () => {
   return (
     <>
       {loading ? (
-        <h2 className="text-center text-3xl text-green-800">Loading</h2>
+       <>
+        <Spinner />
+       </>
       ) : appErr || serverErr ? (
         <h2 className="text-center text-3xl text-red-600">
           {serverErr} {serverErr}
